@@ -1,73 +1,65 @@
-# Welcome to your Lovable project
+# Pharma Find Spot
 
-## Project info
+Aplicação web para localizar farmácias próximas e visualizar produtos em destaque. O projeto foi criado com Vite + React + TypeScript, utiliza Tailwind CSS para o estilo e os componentes do shadcn/ui para acelerar o desenvolvimento de interfaces modernas.
 
-**URL**: https://lovable.dev/projects/32bd03d0-ff69-45d2-93b7-cd4d498a1944
+## Funcionalidades
+- Catálogo de produtos com cards responsivos e filtros por texto.
+- Destaques visuais para promoções e produtos populares.
+- Mapa com indicação das farmácias disponíveis.
+- Componentização reutilizável (Header, Footer, SearchBar, ProductGrid, etc.).
+- Integração com React Router para páginas como Home e NotFound.
 
-## How can I edit this code?
+## Tecnologias principais
+- Vite 5
+- React 18 + TypeScript
+- Tailwind CSS e tailwindcss-animate
+- shadcn/ui (Radix UI + utilitários)
+- React Router DOM
+- React Hook Form, Zod e React Query para formulários e dados
 
-There are several ways of editing your application.
+## Pré-requisitos
+- Node.js **>= 18** (necessário para Vite 5)
+- npm **>= 9** (instalado junto com o Node)
+- Opcional: Bun >= 1.0 caso prefira `bun install`
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/32bd03d0-ff69-45d2-93b7-cd4d498a1944) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
+## Como executar localmente
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+git clone https://github.com/gdema11/pharma-find-spot.git
+cd pharma-find-spot
+npm install
 npm run dev
 ```
+- O servidor de desenvolvimento roda por padrão em `http://localhost:5173`.
+- Ajuste variáveis, dados ou endpoints editando os arquivos em `src/`.
 
-**Edit a file directly in GitHub**
+## Scripts disponíveis
+- `npm run dev` – inicia o ambiente de desenvolvimento com Vite.
+- `npm run build` – gera a versão de produção em `dist/`.
+- `npm run preview` – serve o build gerado para inspeção local.
+- `npm run lint` – executa o ESLint com as regras definidas em `eslint.config.js`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Estrutura do projeto
+- `src/pages` – páginas principais (Index, NotFound).
+- `src/components` – componentes reutilizáveis, incluindo UI (accordion, dialog, etc.).
+- `src/data` – dados estáticos como a lista de produtos.
+- `src/assets` – imagens dos produtos.
+- `public` – arquivos estáticos copiados diretamente para o build final.
 
-**Use GitHub Codespaces**
+## Deploy
+1. Gere o build com `npm run build`.
+2. Publique o conteúdo da pasta `dist/` em um provedor de hospedagem estática (Vercel, Netlify, GitHub Pages, Cloudflare Pages ou servidor próprio).
+3. Caso utilize pipelines, adicione um passo para instalar dependências (`npm ci`) e executar `npm run build` antes de publicar.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Personalização
+- Atualize `src/data/products.ts` para alterar as informações dos produtos exibidos.
+- Ajuste estilos globais em `src/index.css` ou via classes utilitárias do Tailwind.
+- Componentes do shadcn/ui ficam em `src/components/ui`; edite conforme o design desejado.
+- Novas rotas podem ser adicionadas em `src/main.tsx`, onde o React Router é configurado.
 
-## What technologies are used for this project?
+## Contribuindo
+1. Crie um branch (`git checkout -b feature/minha-feature`).
+2. Faça suas alterações e rode `npm run lint`.
+3. Abra um pull request descrevendo o que foi alterado.
 
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/32bd03d0-ff69-45d2-93b7-cd4d498a1944) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Licença
+Defina aqui a licença adequada ao seu uso (por exemplo, MIT). Caso ainda não tenha escolhido, crie um arquivo `LICENSE` com os termos desejados.
