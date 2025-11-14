@@ -61,5 +61,3 @@ npm run dev
 2. Faça suas alterações e rode `npm run lint`.
 3. Abra um pull request descrevendo o que foi alterado.
 
-## Licença
-Defina aqui a licença adequada ao seu uso (por exemplo, MIT). Caso ainda não tenha escolhido, crie um arquivo `LICENSE` com os termos desejados.
