@@ -1,63 +1,68 @@
-# Pharma Find Spot
+﻿# Pharma Find Spot
 
-Aplicação web para localizar farmácias próximas e visualizar produtos em destaque. O projeto foi criado com Vite + React + TypeScript, utiliza Tailwind CSS para o estilo e os componentes do shadcn/ui para acelerar o desenvolvimento de interfaces modernas.
-
-## Funcionalidades
-- Catálogo de produtos com cards responsivos e filtros por texto.
-- Destaques visuais para promoções e produtos populares.
-- Mapa com indicação das farmácias disponíveis.
-- Componentização reutilizável (Header, Footer, SearchBar, ProductGrid, etc.).
-- Integração com React Router para páginas como Home e NotFound.
+Aplicacao web para localizar farmacias e visualizar produtos, agora com front-end e back-end.
 
 ## Tecnologias principais
-- Vite 5
-- React 18 + TypeScript
-- Tailwind CSS e tailwindcss-animate
-- shadcn/ui (Radix UI + utilitários)
-- React Router DOM
-- React Hook Form, Zod e React Query para formulários e dados
+- Front-end: Vite 5, React 18, TypeScript, Tailwind CSS, shadcn/ui
+- Back-end: Node.js, Express, CORS, TypeScript (via tsx)
 
-## Pré-requisitos
-- Node.js **>= 18** (necessário para Vite 5)
-- npm **>= 9** (instalado junto com o Node)
-- Opcional: Bun >= 1.0 caso prefira `bun install`
+## Pre-requisitos
+- Node.js >= 18
+- npm >= 9
 
 ## Como executar localmente
 ```sh
 git clone https://github.com/gdema11/pharma-find-spot.git
 cd pharma-find-spot
 npm install
+```
+
+### Front-end
+```sh
 npm run dev
 ```
-- O servidor de desenvolvimento roda por padrão em `http://localhost:5173`.
-- Ajuste variáveis, dados ou endpoints editando os arquivos em `src/`.
+- Disponivel em `http://localhost:5173`.
 
-## Scripts disponíveis
-- `npm run dev` – inicia o ambiente de desenvolvimento com Vite.
-- `npm run build` – gera a versão de produção em `dist/`.
-- `npm run preview` – serve o build gerado para inspeção local.
-- `npm run lint` – executa o ESLint com as regras definidas em `eslint.config.js`.
+### Back-end (API)
+```sh
+npm run backend
+```
+- Disponivel em `http://localhost:3001`.
 
-## Estrutura do projeto
-- `src/pages` – páginas principais (Index, NotFound).
-- `src/components` – componentes reutilizáveis, incluindo UI (accordion, dialog, etc.).
-- `src/data` – dados estáticos como a lista de produtos.
-- `src/assets` – imagens dos produtos.
-- `public` – arquivos estáticos copiados diretamente para o build final.
+### Back-end em modo desenvolvimento (watch)
+```sh
+npm run dev:backend
+```
 
-## Deploy
-1. Gere o build com `npm run build`.
-2. Publique o conteúdo da pasta `dist/` em um provedor de hospedagem estática (Vercel, Netlify, GitHub Pages, Cloudflare Pages ou servidor próprio).
-3. Caso utilize pipelines, adicione um passo para instalar dependências (`npm ci`) e executar `npm run build` antes de publicar.
+## Endpoints da API
+- `GET /api/health`: status da API.
+- `GET /api/aisles`: lista de corredores.
+- `GET /api/categories`: lista de categorias.
+- `GET /api/products`: lista de produtos.
+- `GET /api/products/:id`: detalhe de produto por ID.
 
-## Personalização
-- Atualize `src/data/products.ts` para alterar as informações dos produtos exibidos.
-- Ajuste estilos globais em `src/index.css` ou via classes utilitárias do Tailwind.
-- Componentes do shadcn/ui ficam em `src/components/ui`; edite conforme o design desejado.
-- Novas rotas podem ser adicionadas em `src/main.tsx`, onde o React Router é configurado.
+## Filtros em `GET /api/products`
+- `q`: busca textual por nome, marca, descricao e tags.
+- `category`: categoria exata.
+- `aisleId`: corredor exato.
 
-## Contribuindo
-1. Crie um branch (`git checkout -b feature/minha-feature`).
-2. Faça suas alterações e rode `npm run lint`.
-3. Abra um pull request descrevendo o que foi alterado.
+Exemplo:
+```sh
+http://localhost:3001/api/products?q=dipirona&category=Analg%C3%A9sicos
+```
 
+## Scripts disponiveis
+- `npm run dev`: inicia o front-end com Vite.
+- `npm run dev:frontend`: alias para iniciar o front-end com Vite.
+- `npm run backend`: inicia o back-end.
+- `npm run dev:backend`: inicia o back-end com watch.
+- `npm run build`: gera a versao de producao em `dist/`.
+- `npm run preview`: serve o build localmente.
+- `npm run lint`: executa o ESLint.
+
+## Estrutura
+- `src/`: front-end (paginas, componentes, dados e assets).
+- `backend/`: servidor da API.
+
+## Observacao
+Os dados retornados pela API sao reaproveitados de `src/data/products.ts`.
