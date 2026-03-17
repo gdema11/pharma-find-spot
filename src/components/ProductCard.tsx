@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { aislesById, Product } from "@/data/products";
+import type { Aisle, Product } from "@/types/catalog";
 import {
   Activity,
   Baby,
@@ -16,6 +16,7 @@ import {
 
 interface ProductCardProps {
   product: Product;
+  aislesById: Record<string, Aisle>;
   onSelect: (product: Product) => void;
 }
 
@@ -95,7 +96,7 @@ const categoryVisuals: Record<
   },
 };
 
-const ProductCard = ({ product, onSelect }: ProductCardProps) => {
+const ProductCard = ({ product, aislesById, onSelect }: ProductCardProps) => {
   const visual = categoryVisuals[product.category] ?? {
     icon: PackageSearch,
     badgeClass: "bg-muted text-muted-foreground",

@@ -7,13 +7,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { categories } from "@/data/products";
 
 interface SearchBarProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   selectedCategory: string;
   onCategoryChange: (value: string) => void;
+  categories: string[];
 }
 
 const SearchBar = ({
@@ -21,6 +21,7 @@ const SearchBar = ({
   onSearchChange,
   selectedCategory,
   onCategoryChange,
+  categories,
 }: SearchBarProps) => {
   const handleClearSearch = () => {
     onSearchChange("");

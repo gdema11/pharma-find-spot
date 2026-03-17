@@ -1,13 +1,14 @@
 import ProductCard from "@/components/ProductCard";
-import { Product } from "@/data/products";
+import type { Aisle, Product } from "@/types/catalog";
 import { Package } from "lucide-react";
 
 interface ProductGridProps {
   products: Product[];
+  aislesById: Record<string, Aisle>;
   onProductSelect: (product: Product) => void;
 }
 
-const ProductGrid = ({ products, onProductSelect }: ProductGridProps) => {
+const ProductGrid = ({ products, aislesById, onProductSelect }: ProductGridProps) => {
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -29,6 +30,7 @@ const ProductGrid = ({ products, onProductSelect }: ProductGridProps) => {
         <ProductCard
           key={product.id}
           product={product}
+          aislesById={aislesById}
           onSelect={onProductSelect}
         />
       ))}

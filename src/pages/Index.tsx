@@ -1,11 +1,24 @@
 import { useMemo, useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import SearchBar from "@/components/SearchBar";
 import ProductGrid from "@/components/ProductGrid";
 import PharmacyMap from "@/components/PharmacyMap";
 import Footer from "@/components/Footer";
-import { products, Product, aislesById } from "@/data/products";
+import { useToast } from "@/hooks/use-toast";
+import type { Aisle, Product } from "@/types/catalog";
+
+const API_BASE_URL = "/api";
+
+async function fetchJson<T>(url: string): Promise<T> {
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Falha ao buscar ${url}`);
+  }
+
+  return response.json() as Promise<T>;
+}
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,24 +26,50 @@ const Index = () => {
   const [highlightedAisleId, setHighlightedAisleId] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const filteredProducts = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase();
+  const { data: aisles = [], isLoading: isLoadingAisles } = useQuery({
+    queryKey: ["aisles"],
+    queryFn: () => fetchJson<Aisle[]>(`${API_BASE_URL}/aisles`),
+  });
 
-    return products.filter((product) => {
-      const matchesSearch =
-        normalizedSearch.length === 0 ||
-        product.name.toLowerCase().includes(normalizedSearch) ||
-        product.brand.toLowerCase().includes(normalizedSearch) ||
-        product.tags?.some((tag) =>
-          tag.toLowerCase().includes(normalizedSearch)
-        );
+  const { data: categories = [], isLoading: isLoadingCategories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => fetchJson<string[]>(`${API_BASE_URL}/categories`),
+  });
 
-      const matchesCategory =
-        selectedCategory === "Todos" || product.category === selectedCategory;
+  const normalizedCategory =
+    selectedCategory === "Todos" ? "" : selectedCategory;
 
-      return matchesSearch && matchesCategory;
-    });
-  }, [searchTerm, selectedCategory]);
+  const { data: filteredProducts = [], isLoading: isLoadingProducts } = useQuery({
+    queryKey: ["products", searchTerm, normalizedCategory],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+
+      if (searchTerm.trim()) {
+        params.set("q", searchTerm.trim());
+      }
+
+      if (normalizedCategory) {
+        params.set("category", normalizedCategory);
+      }
+
+      const queryString = params.toString();
+      const url = queryString
+        ? `${API_BASE_URL}/products?${queryString}`
+        : `${API_BASE_URL}/products`;
+
+      const data = await fetchJson<{ total: number; items: Product[] }>(url);
+      return data.items;
+    },
+  });
+
+  const aislesById = useMemo(
+    () =>
+      aisles.reduce<Record<string, Aisle>>((acc, aisle) => {
+        acc[aisle.id] = aisle;
+        return acc;
+      }, {}),
+    [aisles]
+  );
 
   const handleProductSelect = (product: Product) => {
     setHighlightedAisleId(product.aisleId);
@@ -39,7 +78,7 @@ const Index = () => {
 
     toast({
       title: "Produto localizado!",
-      description: `${product.name} está no ${aisleLabel}.`,
+      description: `${product.name} estÃ¡ no ${aisleLabel}.`,
       duration: 4000,
     });
 
@@ -60,10 +99,20 @@ const Index = () => {
     setHighlightedAisleId(null);
   };
 
+  const visibleCategories = useMemo(
+    () => ["Todos", ...categories.filter((category) => category !== "Todos")],
+    [categories]
+  );
+
+  const featuredCategories = visibleCategories.slice(0, 6);
+
   const resultTitle =
     searchTerm || selectedCategory !== "Todos"
       ? `Resultados (${filteredProducts.length})`
-      : "Catálogo completo";
+      : "CatÃ¡logo completo";
+
+  const isLoading =
+    isLoadingAisles || isLoadingCategories || isLoadingProducts;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -75,10 +124,11 @@ const Index = () => {
           onSearchChange={setSearchTerm}
           selectedCategory={selectedCategory}
           onCategoryChange={handleCategoryChange}
+          categories={visibleCategories}
         />
 
         <div className="flex flex-wrap gap-2">
-          {["Todos", "Analgésicos", "Vitaminas e Suplementos", "Higiene Pessoal", "Primeiros Socorros", "Equipamentos Médicos"].map((category) => {
+          {featuredCategories.map((category) => {
             const isActive = selectedCategory === category;
             return (
               <button
@@ -98,7 +148,7 @@ const Index = () => {
         </div>
 
         <div id="pharmacy-map" className="scroll-mt-8">
-          <PharmacyMap highlightedAisleId={highlightedAisleId} />
+          <PharmacyMap highlightedAisleId={highlightedAisleId} aisles={aisles} />
         </div>
 
         {selectedAisle && (
@@ -119,12 +169,19 @@ const Index = () => {
           <div className="flex flex-col gap-2 md:flex-row md:items-baseline md:justify-between">
             <h2 className="text-3xl font-bold text-foreground">{resultTitle}</h2>
             <p className="text-sm text-muted-foreground">
-              Explore a curadoria da farmácia e toque no item para ver o corredor correspondente.
+              Explore a curadoria da farmÃ¡cia e toque no item para ver o corredor correspondente.
             </p>
           </div>
 
+          {isLoading && (
+            <p className="text-sm text-muted-foreground">
+              Carregando dados do banco...
+            </p>
+          )}
+
           <ProductGrid
             products={filteredProducts}
+            aislesById={aislesById}
             onProductSelect={handleProductSelect}
           />
         </section>

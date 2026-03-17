@@ -1,12 +1,13 @@
-import { aisles } from "@/data/products";
 import { cn } from "@/lib/utils";
+import type { Aisle } from "@/types/catalog";
 import { Compass, MapPin } from "lucide-react";
 
 interface PharmacyMapProps {
   highlightedAisleId: string | null;
+  aisles: Aisle[];
 }
 
-const PharmacyMap = ({ highlightedAisleId }: PharmacyMapProps) => {
+const PharmacyMap = ({ highlightedAisleId, aisles }: PharmacyMapProps) => {
   return (
     <div className="bg-card rounded-2xl shadow-card border border-border/60 px-6 py-7">
       <div className="flex flex-col items-center gap-2 text-center mb-6">
