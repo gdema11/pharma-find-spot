@@ -78,7 +78,7 @@ const Index = () => {
 
     toast({
       title: "Produto localizado!",
-      description: `${product.name} estÃ¡ no ${aisleLabel}.`,
+      description: `${product.name} está no ${aisleLabel}.`,
       duration: 4000,
     });
 
@@ -109,7 +109,7 @@ const Index = () => {
   const resultTitle =
     searchTerm || selectedCategory !== "Todos"
       ? `Resultados (${filteredProducts.length})`
-      : "CatÃ¡logo completo";
+      : "Catálogo completo";
 
   const isLoading =
     isLoadingAisles || isLoadingCategories || isLoadingProducts;
@@ -169,7 +169,7 @@ const Index = () => {
           <div className="flex flex-col gap-2 md:flex-row md:items-baseline md:justify-between">
             <h2 className="text-3xl font-bold text-foreground">{resultTitle}</h2>
             <p className="text-sm text-muted-foreground">
-              Explore a curadoria da farmÃ¡cia e toque no item para ver o corredor correspondente.
+              Explore a curadoria da farmácia e toque no item para ver o corredor correspondente.
             </p>
           </div>
 

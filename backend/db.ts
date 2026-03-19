@@ -142,7 +142,11 @@ initializeDatabase();
 export function getAisles(): Aisle[] {
   return db
     .prepare(
-      "SELECT id, label, summary, description FROM aisles ORDER BY id ASC"
+      `
+      SELECT id, label, summary, description
+      FROM aisles
+      ORDER BY CAST(REPLACE(id, 'corredor-', '') AS INTEGER) ASC
+      `
     )
     .all() as Aisle[];
 }

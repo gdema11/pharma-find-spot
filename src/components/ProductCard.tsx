@@ -24,7 +24,7 @@ const categoryVisuals: Record<
   string,
   { icon: LucideIcon; badgeClass: string; accentClass: string }
 > = {
-  "Analgésicos": {
+  Analgésicos: {
     icon: HeartPulse,
     badgeClass: "bg-rose-500/10 text-rose-600",
     accentClass: "text-rose-600",
@@ -49,7 +49,7 @@ const categoryVisuals: Record<
     badgeClass: "bg-emerald-500/10 text-emerald-600",
     accentClass: "text-emerald-600",
   },
-  "Dermocosméticos": {
+  Dermocosméticos: {
     icon: Sparkles,
     badgeClass: "bg-purple-500/10 text-purple-600",
     accentClass: "text-purple-600",
