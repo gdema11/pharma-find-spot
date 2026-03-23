@@ -1,18 +1,68 @@
-export interface Aisle {
-  id: string;
-  label: string;
-  summary: string;
-  description: string;
+import type { Aisle, Product, ProductAvailability } from "../types/catalog";
+
+type SeedProduct = Omit<
+  Product,
+  "priceInCents" | "stock" | "availability"
+>;
+
+const categoryPricing: Record<
+  string,
+  { basePriceInCents: number; stepInCents: number }
+> = {
+  "AnalgÃ©sicos": { basePriceInCents: 1190, stepInCents: 170 },
+  "Medicamentos OTC": { basePriceInCents: 1490, stepInCents: 190 },
+  "Vitaminas e Suplementos": { basePriceInCents: 2490, stepInCents: 260 },
+  "Higiene Pessoal": { basePriceInCents: 1390, stepInCents: 210 },
+  "Cuidados com a Pele": { basePriceInCents: 1890, stepInCents: 260 },
+  "DermocosmÃ©ticos": { basePriceInCents: 4590, stepInCents: 320 },
+  "Higiene Bucal": { basePriceInCents: 990, stepInCents: 150 },
+  "BebÃªs e Infantil": { basePriceInCents: 1890, stepInCents: 230 },
+  "Primeiros Socorros": { basePriceInCents: 1290, stepInCents: 210 },
+  "Equipamentos MÃ©dicos": { basePriceInCents: 4990, stepInCents: 650 },
+  Diabetes: { basePriceInCents: 2590, stepInCents: 420 },
+  "ChÃ¡s e Naturais": { basePriceInCents: 1590, stepInCents: 180 },
+  "Suplementos Esportivos": { basePriceInCents: 3590, stepInCents: 390 },
+  "Bem-estar": { basePriceInCents: 1790, stepInCents: 250 },
+};
+
+function inferStock(index: number): number {
+  if (index % 11 === 0) {
+    return 0;
+  }
+
+  if (index % 5 === 0) {
+    return 4 + (index % 3);
+  }
+
+  return 12 + (index % 9) * 3;
 }
 
-export interface Product {
-  id: string;
-  name: string;
-  brand: string;
-  category: string;
-  aisleId: string;
-  description: string;
-  tags?: string[];
+function inferAvailability(stock: number): ProductAvailability {
+  if (stock <= 0) {
+    return "Sob encomenda";
+  }
+
+  if (stock <= 6) {
+    return "Ultimas unidades";
+  }
+
+  return "Em estoque";
+}
+
+function enrichProduct(product: SeedProduct, index: number): Product {
+  const pricing =
+    categoryPricing[product.category] ?? {
+      basePriceInCents: 1990,
+      stepInCents: 200,
+    };
+  const stock = inferStock(index + 1);
+
+  return {
+    ...product,
+    priceInCents: pricing.basePriceInCents + pricing.stepInCents * (index % 6),
+    stock,
+    availability: inferAvailability(stock),
+  };
 }
 
 export const aisles: Aisle[] = [
@@ -111,7 +161,7 @@ export const categories = [
   "Bem-estar",
 ];
 
-export const products: Product[] = [
+const baseProducts: SeedProduct[] = [
   {
     id: "analgesico-dipirona-500",
     name: "Dipirona Sódica 500 mg 10 comprimidos",
@@ -743,3 +793,110 @@ export const products: Product[] = [
     tags: ["aromaterapia", "relaxamento"],
   },
 ];
+
+const extraProducts: SeedProduct[] = [
+  {
+    id: "otc-antialergico",
+    name: "Antialergico Diario 12 comprimidos",
+    brand: "Respiral",
+    category: "Medicamentos OTC",
+    aisleId: "corredor-1",
+    description:
+      "Formula de uso diurno para alivio de espirros, coriza e desconforto respiratorio leve.",
+    tags: ["alergia", "respiracao", "sem sonolencia"],
+  },
+  {
+    id: "vitamina-magnesio",
+    name: "Magnesio Quelato 60 capsulas",
+    brand: "NutriCore",
+    category: "Vitaminas e Suplementos",
+    aisleId: "corredor-2",
+    description:
+      "Suporte muscular e metabolico para rotina intensa, sono e recuperacao.",
+    tags: ["magnesio", "recuperacao", "sono"],
+  },
+  {
+    id: "higiene-sabonete-vegetal",
+    name: "Sabonete Vegetal Calmante 90 g",
+    brand: "PureBath",
+    category: "Higiene Pessoal",
+    aisleId: "corredor-3",
+    description:
+      "Limpeza suave para peles sensiveis com extrato vegetal e espuma cremosa.",
+    tags: ["sensivel", "banho", "suave"],
+  },
+  {
+    id: "bucal-antisseptico-pocket",
+    name: "Antisseptico Bucal Pocket 100 ml",
+    brand: "SmilePro",
+    category: "Higiene Bucal",
+    aisleId: "corredor-4",
+    description:
+      "Versao compacta para bolsa ou mochila com protecao diaria contra mau halito.",
+    tags: ["portatil", "halito", "viagem"],
+  },
+  {
+    id: "pele-labial-reparador",
+    name: "Reparador Labial FPS 30",
+    brand: "SkinBalance",
+    category: "Cuidados com a Pele",
+    aisleId: "corredor-5",
+    description:
+      "Protege labios ressecados com filtro solar, manteiga vegetal e rapida absorcao.",
+    tags: ["labial", "fps", "hidratacao"],
+  },
+  {
+    id: "bebe-mamadeira-anticolica",
+    name: "Mamadeira Anticolica 260 ml",
+    brand: "BabySoft",
+    category: "BebÃªs e Infantil",
+    aisleId: "corredor-6",
+    description:
+      "Bico de fluxo controlado com sistema de ventilacao para reduzir desconfortos na mamada.",
+    tags: ["mamada", "anticolica", "bebe"],
+  },
+  {
+    id: "primeiros-socorros-gaze",
+    name: "Gaze Esteril 13 fios 10 unidades",
+    brand: "SafeLine",
+    category: "Primeiros Socorros",
+    aisleId: "corredor-7",
+    description:
+      "Pacotes individuais para curativos e limpeza de feridas com manuseio seguro.",
+    tags: ["curativo", "esteril", "gaze"],
+  },
+  {
+    id: "diabetes-lancetador",
+    name: "Lancetador Ajustavel",
+    brand: "GlucoTrack",
+    category: "Diabetes",
+    aisleId: "corredor-8",
+    description:
+      "Dispositivo ergonomico com niveis de profundidade para rotina de medicao mais confortavel.",
+    tags: ["medicao", "ergonomico", "ajustavel"],
+  },
+  {
+    id: "naturais-cha-hortela",
+    name: "Cha de Hortela Digestivo 20 saches",
+    brand: "NaturaTea",
+    category: "ChÃ¡s e Naturais",
+    aisleId: "corredor-9",
+    description:
+      "Infusao refrescante para rotina digestiva e pausas leves durante o dia.",
+    tags: ["digestao", "hortela", "leve"],
+  },
+  {
+    id: "sports-isotonico-po",
+    name: "Isotonico em Po Limao 300 g",
+    brand: "ProSeries",
+    category: "Suplementos Esportivos",
+    aisleId: "corredor-10",
+    description:
+      "Reposicao de sais minerais e carboidratos para treinos longos e recuperacao rapida.",
+    tags: ["hidratacao", "resistencia", "treino"],
+  },
+];
+
+export const products: Product[] = [...baseProducts, ...extraProducts].map(
+  enrichProduct
+);

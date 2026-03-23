@@ -40,8 +40,18 @@ app.get("/api/products", (req, res) => {
       : "";
   const aisleId =
     typeof req.query.aisleId === "string" ? req.query.aisleId.trim() : "";
+  const availability =
+    typeof req.query.availability === "string"
+      ? req.query.availability.trim().toLowerCase()
+      : "";
+  const sort =
+    req.query.sort === "price-asc" ||
+    req.query.sort === "price-desc" ||
+    req.query.sort === "stock-desc"
+      ? req.query.sort
+      : "name";
 
-  const filtered = getProducts({ q, category, aisleId });
+  const filtered = getProducts({ q, category, aisleId, availability, sort });
 
   res.json({
     total: filtered.length,

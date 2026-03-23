@@ -8,30 +8,36 @@ interface PharmacyMapProps {
 }
 
 const PharmacyMap = ({ highlightedAisleId, aisles }: PharmacyMapProps) => {
-  return (
-    <div className="bg-card rounded-2xl shadow-card border border-border/60 px-6 py-7">
-      <div className="flex flex-col items-center gap-2 text-center mb-6">
-        <div className="flex items-center gap-2 text-primary">
-          <Compass className="w-5 h-5" />
-          <h2 className="text-2xl font-bold">Mapa inteligente da farmácia</h2>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          Toque em um produto para destacar o corredor correspondente e receber instruções rápidas.
-        </p>
-      </div>
+  const activeAisle =
+    aisles.find((aisle) => aisle.id === highlightedAisleId) ?? null;
 
-      {highlightedAisleId && (
-        <div className="mb-6 flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-semibold mb-2">
-            <MapPin className="w-4 h-4" />
-            {aisles.find((aisle) => aisle.id === highlightedAisleId)?.label ??
-              "Corredor"}
+  return (
+    <section className="rounded-3xl border border-border/60 bg-card px-6 py-7 shadow-card">
+      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-primary">
+            <Compass className="h-5 w-5" />
+            <h2 className="text-2xl font-bold text-foreground">
+              Mapa inteligente da farmacia
+            </h2>
           </div>
-          <p className="text-sm text-muted-foreground max-w-lg">
-            Dirija-se ao corredor em destaque e procure pelas sinalizações da categoria indicada.
+          <p className="max-w-2xl text-sm text-muted-foreground">
+            O corredor em destaque muda assim que voce seleciona um produto. Isso reduz a navegacao e deixa a busca mais direta.
           </p>
         </div>
-      )}
+
+        {activeAisle && (
+          <div className="rounded-2xl bg-primary px-4 py-3 text-primary-foreground">
+            <p className="text-xs uppercase tracking-[0.2em] text-primary-foreground/80">
+              Corredor selecionado
+            </p>
+            <p className="mt-1 inline-flex items-center gap-2 text-lg font-semibold">
+              <MapPin className="h-4 w-4" />
+              {activeAisle.label}
+            </p>
+          </div>
+        )}
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {aisles.map((aisle, index) => {
@@ -41,32 +47,32 @@ const PharmacyMap = ({ highlightedAisleId, aisles }: PharmacyMapProps) => {
             <div
               key={aisle.id}
               className={cn(
-                "relative rounded-xl border px-5 py-4 text-left transition-all duration-300",
-                "bg-muted/40 border-border hover:border-primary/50 hover:shadow-md",
+                "rounded-2xl border px-5 py-4 transition-all duration-300",
+                "bg-muted/30 border-border hover:border-primary/40 hover:shadow-md",
                 isActive &&
-                  "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/30 scale-[1.02]"
+                  "scale-[1.02] border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/20"
               )}
             >
-              <div
+              <p
                 className={cn(
-                  "text-sm font-semibold text-muted-foreground/70",
+                  "text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground",
                   isActive && "text-primary-foreground/80"
                 )}
               >
-                {String(index + 1).padStart(2, "0")}
-              </div>
-              <div className="mt-2 text-lg font-semibold">{aisle.label}</div>
-              <div
+                Area {String(index + 1).padStart(2, "0")}
+              </p>
+              <h3 className="mt-2 text-lg font-semibold">{aisle.label}</h3>
+              <p
                 className={cn(
-                  "text-sm font-medium mt-2",
+                  "mt-2 text-sm font-medium",
                   isActive ? "text-primary-foreground/90" : "text-primary"
                 )}
               >
                 {aisle.summary}
-              </div>
+              </p>
               <p
                 className={cn(
-                  "text-xs mt-3 leading-relaxed",
+                  "mt-3 text-sm leading-relaxed",
                   isActive
                     ? "text-primary-foreground/80"
                     : "text-muted-foreground"
@@ -78,7 +84,7 @@ const PharmacyMap = ({ highlightedAisleId, aisles }: PharmacyMapProps) => {
           );
         })}
       </div>
-    </div>
+    </section>
   );
 };
 

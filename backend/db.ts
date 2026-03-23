@@ -22,8 +22,31 @@ type ProductRow = {
   category: string;
   aisleId: string;
   description: string;
+  priceInCents: number;
+  stock: number;
+  availability: Product["availability"];
   tag: string | null;
 };
+
+type ProductFilters = {
+  q?: string;
+  category?: string;
+  aisleId?: string;
+  availability?: string;
+  sort?: "name" | "price-asc" | "price-desc" | "stock-desc";
+};
+
+function ensureColumn(tableName: string, columnName: string, definition: string) {
+  const columns = db
+    .prepare(`PRAGMA table_info(${tableName})`)
+    .all() as Array<{ name: string }>;
+
+  if (columns.some((column) => column.name === columnName)) {
+    return;
+  }
+
+  db.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
+}
 
 function initializeDatabase() {
   db.exec(`
@@ -55,14 +78,9 @@ function initializeDatabase() {
       PRIMARY KEY (product_id, tag)
     );
   `);
-
-  const productCount = db
-    .prepare("SELECT COUNT(*) as total FROM products")
-    .get() as { total: number };
-
-  if (productCount.total > 0) {
-    return;
-  }
+  ensureColumn("products", "price_in_cents", "INTEGER NOT NULL DEFAULT 0");
+  ensureColumn("products", "stock", "INTEGER NOT NULL DEFAULT 0");
+  ensureColumn("products", "availability", "TEXT NOT NULL DEFAULT 'Em estoque'");
 
   const insertAisle = db.prepare(`
     INSERT OR REPLACE INTO aisles (id, label, summary, description)
@@ -75,12 +93,28 @@ function initializeDatabase() {
   `);
 
   const insertProduct = db.prepare(`
-    INSERT OR REPLACE INTO products (id, name, brand, category, aisle_id, description)
-    VALUES (@id, @name, @brand, @category, @aisleId, @description)
-  `);
-
-  const deleteProductTags = db.prepare(`
-    DELETE FROM product_tags WHERE product_id = ?
+    INSERT INTO products (
+      id,
+      name,
+      brand,
+      category,
+      aisle_id,
+      description,
+      price_in_cents,
+      stock,
+      availability
+    )
+    VALUES (
+      @id,
+      @name,
+      @brand,
+      @category,
+      @aisleId,
+      @description,
+      @priceInCents,
+      @stock,
+      @availability
+    )
   `);
 
   const insertProductTag = db.prepare(`
@@ -89,6 +123,14 @@ function initializeDatabase() {
   `);
 
   const seedDatabase = db.transaction(() => {
+    // Keep demo data deterministic so the UI and the database stay aligned.
+    db.exec(`
+      DELETE FROM product_tags;
+      DELETE FROM products;
+      DELETE FROM categories;
+      DELETE FROM aisles;
+    `);
+
     for (const aisle of aisles) {
       insertAisle.run(aisle);
     }
@@ -99,7 +141,6 @@ function initializeDatabase() {
 
     for (const product of products) {
       insertProduct.run(product);
-      deleteProductTags.run(product.id);
 
       for (const tag of product.tags ?? []) {
         insertProductTag.run(product.id, tag);
@@ -130,6 +171,9 @@ function mapProductRows(rows: ProductRow[]): Product[] {
       category: row.category,
       aisleId: row.aisleId,
       description: row.description,
+      priceInCents: row.priceInCents,
+      stock: row.stock,
+      availability: row.availability,
       tags: row.tag ? [row.tag] : [],
     });
   }
@@ -159,11 +203,7 @@ export function getCategories(): string[] {
   return rows.map((row) => row.name);
 }
 
-export function getProducts(filters: {
-  q?: string;
-  category?: string;
-  aisleId?: string;
-}): Product[] {
+export function getProducts(filters: ProductFilters): Product[] {
   const conditions: string[] = [];
   const params: Record<string, string> = {};
 
@@ -194,8 +234,22 @@ export function getProducts(filters: {
     params.aisleId = filters.aisleId;
   }
 
+  if (filters.availability) {
+    conditions.push("lower(p.availability) = @availability");
+    params.availability = filters.availability.toLowerCase();
+  }
+
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+  const orderClause =
+    filters.sort === "price-asc"
+      ? "ORDER BY p.price_in_cents ASC, p.name ASC, pt.tag ASC"
+      : filters.sort === "price-desc"
+        ? "ORDER BY p.price_in_cents DESC, p.name ASC, pt.tag ASC"
+        : filters.sort === "stock-desc"
+          ? "ORDER BY p.stock DESC, p.name ASC, pt.tag ASC"
+          : "ORDER BY p.name ASC, pt.tag ASC";
 
   const rows = db
     .prepare(
@@ -207,11 +261,14 @@ export function getProducts(filters: {
         p.category,
         p.aisle_id as aisleId,
         p.description,
+        p.price_in_cents as priceInCents,
+        p.stock,
+        p.availability as availability,
         pt.tag
       FROM products p
       LEFT JOIN product_tags pt ON pt.product_id = p.id
       ${whereClause}
-      ORDER BY p.name ASC, pt.tag ASC
+      ${orderClause}
       `
     )
     .all(params) as ProductRow[];
@@ -230,6 +287,9 @@ export function getProductById(id: string): Product | null {
         p.category,
         p.aisle_id as aisleId,
         p.description,
+        p.price_in_cents as priceInCents,
+        p.stock,
+        p.availability as availability,
         pt.tag
       FROM products p
       LEFT JOIN product_tags pt ON pt.product_id = p.id
