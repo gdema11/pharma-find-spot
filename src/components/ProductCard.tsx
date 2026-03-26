@@ -1,9 +1,11 @@
 import { Card } from "@/components/ui/card";
+import { getHighlightParts } from "@/lib/search";
 import type { Aisle, Product } from "@/types/catalog";
 
 interface ProductCardProps {
   product: Product;
   aislesById: Record<string, Aisle>;
+  searchTerm?: string;
 }
 
 function formatCurrency(priceInCents: number) {
@@ -13,7 +15,11 @@ function formatCurrency(priceInCents: number) {
   }).format(priceInCents / 100);
 }
 
-const ProductCard = ({ product, aislesById }: ProductCardProps) => {
+const ProductCard = ({
+  product,
+  aislesById,
+  searchTerm = "",
+}: ProductCardProps) => {
   const aisle = aislesById[product.aisleId];
 
   return (
@@ -21,9 +27,25 @@ const ProductCard = ({ product, aislesById }: ProductCardProps) => {
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <h3 className="text-base font-semibold text-foreground">
-            {product.name}
+            {getHighlightParts(product.name, searchTerm).map((part, index) => (
+              <span
+                key={`${product.id}-name-${index}`}
+                className={part.highlighted ? "text-primary" : ""}
+              >
+                {part.text}
+              </span>
+            ))}
           </h3>
-          <p className="mt-1 text-sm text-muted-foreground">{product.brand}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {getHighlightParts(product.brand, searchTerm).map((part, index) => (
+              <span
+                key={`${product.id}-brand-${index}`}
+                className={part.highlighted ? "font-medium text-foreground" : ""}
+              >
+                {part.text}
+              </span>
+            ))}
+          </p>
           <p className="mt-3 text-sm font-medium text-primary/85">
             {aisle?.label ?? "Corredor"}
           </p>
@@ -32,6 +54,9 @@ const ProductCard = ({ product, aislesById }: ProductCardProps) => {
           {formatCurrency(product.priceInCents)}
         </p>
       </div>
+      <p className="mt-4 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
+        Retire no {aisle?.label ?? "corredor indicado"}
+      </p>
     </Card>
   );
 };

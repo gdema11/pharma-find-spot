@@ -3,6 +3,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { aisles, categories, products } from "../src/data/products";
+import {
+  getProductSearchRank,
+  matchesSearchQuery,
+  normalizeSearchText,
+} from "../src/lib/search";
 import type { Aisle, Product } from "../src/types/catalog";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -206,23 +211,7 @@ export function getCategories(): string[] {
 export function getProducts(filters: ProductFilters): Product[] {
   const conditions: string[] = [];
   const params: Record<string, string> = {};
-
-  if (filters.q) {
-    conditions.push(`
-      (
-        lower(p.name) LIKE @query OR
-        lower(p.brand) LIKE @query OR
-        lower(p.description) LIKE @query OR
-        EXISTS (
-          SELECT 1
-          FROM product_tags pt2
-          WHERE pt2.product_id = p.id
-            AND lower(pt2.tag) LIKE @query
-        )
-      )
-    `);
-    params.query = `%${filters.q.toLowerCase()}%`;
-  }
+  const normalizedQuery = normalizeSearchText(filters.q ?? "");
 
   if (filters.category) {
     conditions.push("lower(p.category) = @category");
@@ -242,15 +231,6 @@ export function getProducts(filters: ProductFilters): Product[] {
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  const orderClause =
-    filters.sort === "price-asc"
-      ? "ORDER BY p.price_in_cents ASC, p.name ASC, pt.tag ASC"
-      : filters.sort === "price-desc"
-        ? "ORDER BY p.price_in_cents DESC, p.name ASC, pt.tag ASC"
-        : filters.sort === "stock-desc"
-          ? "ORDER BY p.stock DESC, p.name ASC, pt.tag ASC"
-          : "ORDER BY p.name ASC, pt.tag ASC";
-
   const rows = db
     .prepare(
       `
@@ -268,12 +248,43 @@ export function getProducts(filters: ProductFilters): Product[] {
       FROM products p
       LEFT JOIN product_tags pt ON pt.product_id = p.id
       ${whereClause}
-      ${orderClause}
+      ORDER BY p.name ASC, pt.tag ASC
       `
     )
     .all(params) as ProductRow[];
 
-  return mapProductRows(rows);
+  const mappedProducts = mapProductRows(rows);
+  const textFilteredProducts = normalizedQuery
+    ? mappedProducts.filter((product) => matchesSearchQuery(product, normalizedQuery))
+    : mappedProducts;
+
+  return textFilteredProducts.sort((first, second) => {
+    if (normalizedQuery) {
+      const rankDifference =
+        getProductSearchRank(first, normalizedQuery) -
+        getProductSearchRank(second, normalizedQuery);
+
+      if (rankDifference !== 0) {
+        return rankDifference;
+      }
+    }
+
+    if (filters.sort === "price-asc") {
+      if (first.priceInCents !== second.priceInCents) {
+        return first.priceInCents - second.priceInCents;
+      }
+    } else if (filters.sort === "price-desc") {
+      if (first.priceInCents !== second.priceInCents) {
+        return second.priceInCents - first.priceInCents;
+      }
+    } else if (filters.sort === "stock-desc") {
+      if (first.stock !== second.stock) {
+        return second.stock - first.stock;
+      }
+    }
+
+    return first.name.localeCompare(second.name, "pt-BR");
+  });
 }
 
 export function getProductById(id: string): Product | null {
