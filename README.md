@@ -86,24 +86,58 @@ http://localhost:3001/api/products?q=dipirona&category=Analg%C3%A9sicos
 
 ## Testes automatizados
 
-O projeto possui cobertura E2E com Playwright para fluxos de usabilidade e validações de acessibilidade.
+O projeto possui cobertura E2E com Playwright para validar fluxos principais da aplicação, regras de busca, acessibilidade, analytics e navegação, tudo centralizado no mesmo relatório de execução.
 
 ## O que os testes cobrem
-- Busca de produtos
-- Limpeza do campo de busca
-- Abertura de sugestões ao digitar
-- Navegação por teclado nas sugestões
-- Fechamento das sugestões com Escape
-- Persistência do valor pesquisado ao exibir resultados
-- Verificação de estados sem resultado
-- Validação automática de acessibilidade com axe na home e na área principal de resultados
-- Checagem de nome acessível do campo de busca
-- Checagem de nome acessível do botão de limpar busca
-- Checagem de exposição acessível da lista de sugestões e de suas opções
+
+## Usabilidade
+- busca de produtos
+- limpeza do campo de busca
+- abertura de sugestões ao digitar
+- navegação por teclado nas sugestões
+- fechamento das sugestões com Escape
+- persistência do valor pesquisado ao exibir resultados
+- validação do estado sem resultado
+- retorno ao estado inicial após nova busca
+
+## Acessibilidade
+- validação automática com axe na home
+- validação automática com axe na área principal de resultados
+- checagem de nome acessível do campo de busca
+- checagem de nome acessível do botão de limpar busca
+- checagem da exposição acessível da lista de sugestões e de suas opções
+
+## API
+- validação do endpoint de health
+- validação do retorno da listagem de produtos
+- validação de filtros por termo, categoria e corredor
+- validação de ordenação
+- validação de resposta 404 para produto inexistente
+
+## Busca avançada
+- comportamento da busca com poucos caracteres
+- busca por termos mais amplos
+- comportamento da tela em buscas sem resultado
+- retorno ao estado inicial após limpar ou reiniciar a busca
+
+## Analytics de busca
+- registro de busca recente
+- exibição de buscas mais feitas
+- exibição de termos sem resultado
+- reaplicação de buscas salvas
+
+## Navegação e rotas
+- renderização da página 404
+- retorno da página 404 para a home
+- validação de elementos principais da home
 
 ## Estrutura dos testes
 - `e2e/usability.spec.ts`: cenários de usabilidade
 - `e2e/accessibility.spec.ts`: cenários de acessibilidade
+- `e2e/api/catalog-api.spec.ts`: cenários de API
+- `e2e/search/search-behavior.spec.ts`: cenários de busca avançada
+- `e2e/analytics/search-memory.spec.ts`: cenários de memória de busca e analytics
+- `e2e/routing/navigation.spec.ts`: cenários de navegação e rotas
 - `playwright.config.ts`: configuração de execução dos testes E2E
 
 ## Observações sobre os testes:
@@ -111,6 +145,7 @@ O projeto possui cobertura E2E com Playwright para fluxos de usabilidade e valid
 - Os testes iniciam automaticamente o front-end e o back-end usando a configuração do Playwright
 - O front-end é executado em http://127.0.0.1:8080
 - O back-end é validado em http://127.0.0.1:3001/api/health
+- Toda a suíte aparece no mesmo report do Playwright
 - Os relatórios e arquivos temporários de execução não devem ser versionados
 
 ## Scripts disponíveis
@@ -133,4 +168,8 @@ O projeto possui cobertura E2E com Playwright para fluxos de usabilidade e valid
 - `src/`: front-end, tipos e dados iniciais dos produtos
 - `backend/`: servidor da API, banco de dados e arquivo SQLite
 - `e2e/`: testes de usabilidade e acessibilidade
+- `e2e/api/`: testes de API
+- `e2e/search/`: testes de comportamento de busca
+- `e2e/analytics/`: testes de memória de busca e analytics
+- `e2e/routing/`: testes de navegação e rotas
 - `playwright.config.ts`: configuração dos testes E2E
