@@ -4,7 +4,9 @@ test.describe('Memória de busca e analytics', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => {
-      window.localStorage.clear();
+      window.localStorage.removeItem('pharmaspot-search-history');
+      window.localStorage.removeItem('pharmaspot-top-searches');
+      window.localStorage.removeItem('pharmaspot-no-result-searches');
     });
     await page.reload({ waitUntil: 'domcontentloaded' });
   });

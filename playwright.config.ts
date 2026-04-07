@@ -9,7 +9,10 @@ export default defineConfig({
     timeout: 10000,
   },
   retries: process.env.CI ? 2 : 0,
-  reporter: 'html',
+  reporter: [
+    ['html'],
+    ['json', { outputFile: 'test-results/results.json' }],
+  ],
   use: {
     baseURL: 'http://127.0.0.1:8080',
     trace: 'on-first-retry',

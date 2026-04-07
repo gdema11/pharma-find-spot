@@ -8,6 +8,7 @@ Aplicação web para localizar produtos dentro de uma farmácia, com front-end e
 - Banco de dados: SQLite com `better-sqlite3`
 - Testes E2E: Playwright
 - Acessibilidade: axe-core com `@axe-core/playwright`
+- Dashboard de qualidade: React + Recharts
 
 ## Pré-requisitos
 - Node.js 18 ou superior
@@ -140,6 +141,47 @@ O projeto possui cobertura E2E com Playwright para validar fluxos principais da 
 - `e2e/routing/navigation.spec.ts`: cenários de navegação e rotas
 - `playwright.config.ts`: configuração de execução dos testes E2E
 
+## Dashboard de qualidade
+
+O projeto possui uma página dedicada para apresentação dos resultados da suíte E2E, consolidando os dados mais importantes em um dashboard visual alinhado com a identidade do Pharma Find Spot.
+
+## O que o dashboard apresenta
+- total de testes executados
+- quantidade de testes aprovados
+- quantidade de falhas
+- tempo total de execução
+- taxa de aprovação da suíte
+- ambiente de execução
+- cobertura por domínio
+- distribuição dos resultados
+- detalhamento da suíte por bloco funcional
+- principais ganhos obtidos com a estratégia de testes
+- indicadores de qualidade validados no projeto
+
+## Como o dashboard funciona
+- o Playwright gera um arquivo JSON com o resultado da execução
+- um script transforma esse resultado em um resumo consumido pelo front-end
+- a página do dashboard lê esse resumo e atualiza os dados exibidos
+- isso permite apresentar números reais da última execução da suíte
+
+## Rota do dashboard
+
+Abra no navegador:
+
+```sh
+http://localhost:8080/dashboard-qualidade`
+```
+
+## Fluxo para atualizar o dashboard com a última execução
+
+```sh
+npm run test:e2e
+npm run test:summary
+npm run dev
+```
+
+Se o front-end já estiver rodando, basta atualizar a página do dashboard após executar o resumo.
+
 ## Observações sobre os testes:
 
 - Os testes iniciam automaticamente o front-end e o back-end usando a configuração do Playwright
@@ -162,14 +204,18 @@ O projeto possui cobertura E2E com Playwright para validar fluxos principais da 
 - `npm run test:e2e:headed`: executa os testes E2E com navegador aberto
 - `npm run test:usability`: executa apenas os testes de usabilidade
 - `npm run test:accessibility`: executa apenas os testes de acessibilidade
+- `npm run test:summary`: gera o resumo JSON consumido pelo dashboard de qualidade
 
 
 ## Estrutura
 - `src/`: front-end, tipos e dados iniciais dos produtos
+- `src/pages/QualityDashboard.tsx`: dashboard de qualidade com os resultados da suíte
 - `backend/`: servidor da API, banco de dados e arquivo SQLite
 - `e2e/`: testes de usabilidade e acessibilidade
 - `e2e/api/`: testes de API
 - `e2e/search/`: testes de comportamento de busca
 - `e2e/analytics/`: testes de memória de busca e analytics
 - `e2e/routing/`: testes de navegação e rotas
+- `scripts/generate-playwright-summary.mjs`: geração do resumo JSON da suíte
+- `public/test-results-summary.json`: resumo consumido pelo dashboard
 - `playwright.config.ts`: configuração dos testes E2E

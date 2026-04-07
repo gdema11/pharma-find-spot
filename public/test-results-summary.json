@@ -1,0 +1,44 @@
+{
+  "total": 30,
+  "passed": 30,
+  "failed": 0,
+  "flaky": 0,
+  "skipped": 0,
+  "duration": "23.6s",
+  "durationMs": 23579.876,
+  "execution": "06/04/2026, 21:07:22",
+  "browser": "Chromium",
+  "approvalRate": 100,
+  "suites": [
+    {
+      "key": "accessibility",
+      "name": "Acessibilidade",
+      "total": 5
+    },
+    {
+      "key": "analytics",
+      "name": "Analytics",
+      "total": 4
+    },
+    {
+      "key": "api",
+      "name": "API",
+      "total": 6
+    },
+    {
+      "key": "search",
+      "name": "Busca",
+      "total": 5
+    },
+    {
+      "key": "routing",
+      "name": "Rotas",
+      "total": 3
+    },
+    {
+      "key": "usability",
+      "name": "Usabilidade",
+      "total": 7
+    }
+  ]
+}

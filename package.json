@@ -16,7 +16,8 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:accessibility": "playwright test e2e/accessibility.spec.ts",
-    "test:usability": "playwright test e2e/usability.spec.ts"
+    "test:usability": "playwright test e2e/usability.spec.ts",
+    "test:summary": "node scripts/generate-playwright-summary.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -73,9 +74,9 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.1",
+    "@axe-core/playwright": "^4.10.2",
     "@eslint/js": "^9.32.0",
-    "@playwright/test": "^1.58.2",
+    "@playwright/test": "^1.55.0",
     "@tailwindcss/typography": "^0.5.16",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
