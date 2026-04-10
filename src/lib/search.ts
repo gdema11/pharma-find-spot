@@ -11,6 +11,21 @@ const synonymDictionary: Record<string, string[]> = {
   remedio: ["medicamento", "medicamentos otc", "analgesico"],
   vitamina: ["suplemento", "suplementos", "imunidade"],
   "vitamina c": ["imunidade", "suplemento"],
+  "pasta de dente": ["creme dental"],
+  "pasta dental": ["creme dental"],
+  camisinha: ["preservativo"],
+  "band aid": ["curativo"],
+  glicose: ["glicosimetro", "diabetes", "tiras"],
+  "acucar no sangue": ["glicosimetro", "diabetes"],
+  "protetor labial": ["reparador labial", "labial"],
+  "hidratante labial": ["reparador labial", "labial"],
+  "dor de barriga": ["buscopan", "espasmo", "colica"],
+  "nariz entupido": ["descongestionante", "soro nasal"],
+  congestionamento: ["descongestionante nasal"],
+  "fralda adulto": ["fralda geriatrica"],
+  incontinencia: ["fralda geriatrica"],
+  "sal de fruta": ["antiacido", "azia"],
+  estomago: ["antiacido", "buscopan"],
 };
 const stopWords = new Set([
   "a",
@@ -268,8 +283,7 @@ export function matchesSearchQuery(product: Product, query: string) {
 
 export function getHighlightParts(text: string, query: string) {
   const normalizedText = normalizeSearchText(text);
-  const aliases = getSearchAliases(query);
-  const primaryQuery = aliases[0] ?? "";
+  const primaryQuery = normalizeSearchText(query);
 
   if (!primaryQuery) {
     return [{ text, highlighted: false }];
@@ -278,13 +292,23 @@ export function getHighlightParts(text: string, query: string) {
   let start = -1;
   let length = 0;
 
-  for (const alias of aliases) {
-    const index = normalizedText.indexOf(alias);
-
-    if (index >= 0) {
-      start = index;
-      length = alias.length;
-      break;
+  // Only highlight based on what the user actually typed, not expanded aliases
+  const index = normalizedText.indexOf(primaryQuery);
+  if (index >= 0) {
+    start = index;
+    length = primaryQuery.length;
+  } else {
+    // Try word-start match for the primary query
+    const tokens = tokenizeSearchText(normalizedText);
+    for (const token of tokens) {
+      if (token.startsWith(primaryQuery)) {
+        const tokenIndex = normalizedText.indexOf(token);
+        if (tokenIndex >= 0) {
+          start = tokenIndex;
+          length = primaryQuery.length;
+          break;
+        }
+      }
     }
   }
 
