@@ -1,11 +1,14 @@
 import cors from "cors";
 import express from "express";
 import {
+  createProduct,
   dbPath,
+  deleteProduct,
   getAisles,
   getCategories,
   getProductById,
   getProducts,
+  updateProduct,
 } from "./db";
 
 const app = express();
@@ -64,12 +67,54 @@ app.get("/api/products/:id", (req, res) => {
 
   if (!product) {
     res.status(404).json({
-      error: "Produto nao encontrado",
+      error: "Produto não encontrado",
     });
     return;
   }
 
   res.json(product);
+});
+
+app.post("/api/products", (req, res) => {
+  const { id, name, brand, category, aisleId, description, priceInCents, stock, availability, tags } = req.body;
+
+  if (!id || !name || !brand || !category || !aisleId || !description || !availability ||
+      typeof priceInCents !== "number" || !Number.isFinite(priceInCents) || priceInCents < 0 ||
+      typeof stock !== "number" || !Number.isFinite(stock) || stock < 0) {
+    res.status(400).json({ error: "Campos obrigatórios faltando ou inválidos: id, name, brand, category, aisleId, description, priceInCents (número >= 0), stock (número >= 0), availability" });
+    return;
+  }
+
+  const existing = getProductById(id);
+  if (existing) {
+    res.status(409).json({ error: "Já existe um produto com esse id" });
+    return;
+  }
+
+  const product = createProduct({ id, name, brand, category, aisleId, description, priceInCents, stock, availability, tags });
+  res.status(201).json(product);
+});
+
+app.put("/api/products/:id", (req, res) => {
+  const updated = updateProduct(req.params.id, req.body);
+
+  if (!updated) {
+    res.status(404).json({ error: "Produto não encontrado" });
+    return;
+  }
+
+  res.json(updated);
+});
+
+app.delete("/api/products/:id", (req, res) => {
+  const deleted = deleteProduct(req.params.id);
+
+  if (!deleted) {
+    res.status(404).json({ error: "Produto não encontrado" });
+    return;
+  }
+
+  res.status(204).send();
 });
 
 app.listen(port, () => {

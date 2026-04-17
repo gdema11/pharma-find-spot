@@ -317,4 +317,93 @@ export function getProductById(id: string): Product | null {
   return mapProductRows(rows)[0];
 }
 
+type CreateProductInput = {
+  id: string;
+  name: string;
+  brand: string;
+  category: string;
+  aisleId: string;
+  description: string;
+  priceInCents: number;
+  stock: number;
+  availability: Product["availability"];
+  tags?: string[];
+};
+
+type UpdateProductInput = Partial<Omit<CreateProductInput, "id">>;
+
+export function createProduct(input: CreateProductInput): Product {
+  const insertProduct = db.prepare(`
+    INSERT INTO products (id, name, brand, category, aisle_id, description, price_in_cents, stock, availability)
+    VALUES (@id, @name, @brand, @category, @aisleId, @description, @priceInCents, @stock, @availability)
+  `);
+
+  const insertTag = db.prepare(`
+    INSERT OR IGNORE INTO product_tags (product_id, tag) VALUES (?, ?)
+  `);
+
+  const insertCategory = db.prepare(`
+    INSERT OR IGNORE INTO categories (name) VALUES (?)
+  `);
+
+  db.transaction(() => {
+    insertProduct.run(input);
+    insertCategory.run(input.category);
+    for (const tag of input.tags ?? []) {
+      insertTag.run(input.id, tag);
+    }
+  })();
+
+  return getProductById(input.id)!;
+}
+
+export function updateProduct(id: string, input: UpdateProductInput): Product | null {
+  const existing = getProductById(id);
+  if (!existing) return null;
+
+  const fields: string[] = [];
+  const params: Record<string, unknown> = { id };
+
+  if (input.name !== undefined) { fields.push("name = @name"); params.name = input.name; }
+  if (input.brand !== undefined) { fields.push("brand = @brand"); params.brand = input.brand; }
+  if (input.category !== undefined) { fields.push("category = @category"); params.category = input.category; }
+  if (input.aisleId !== undefined) { fields.push("aisle_id = @aisleId"); params.aisleId = input.aisleId; }
+  if (input.description !== undefined) { fields.push("description = @description"); params.description = input.description; }
+  if (input.priceInCents !== undefined) { fields.push("price_in_cents = @priceInCents"); params.priceInCents = input.priceInCents; }
+  if (input.stock !== undefined) { fields.push("stock = @stock"); params.stock = input.stock; }
+  if (input.availability !== undefined) { fields.push("availability = @availability"); params.availability = input.availability; }
+
+  db.transaction(() => {
+    if (fields.length > 0) {
+      db.prepare(`UPDATE products SET ${fields.join(", ")} WHERE id = @id`).run(params);
+    }
+
+    if (input.tags !== undefined) {
+      db.prepare("DELETE FROM product_tags WHERE product_id = ?").run(id);
+      const insertTag = db.prepare("INSERT OR IGNORE INTO product_tags (product_id, tag) VALUES (?, ?)");
+      for (const tag of input.tags) {
+        insertTag.run(id, tag);
+      }
+    }
+
+    if (input.category !== undefined) {
+      db.prepare("INSERT OR IGNORE INTO categories (name) VALUES (?)").run(input.category);
+    }
+  })();
+
+  return getProductById(id);
+}
+
+export function deleteProduct(id: string): boolean {
+  const existing = getProductById(id);
+  if (!existing) return false;
+
+  db.transaction(() => {
+    db.prepare("DELETE FROM product_tags WHERE product_id = ?").run(id);
+    db.prepare("DELETE FROM products WHERE id = ?").run(id);
+  })();
+
+  return true;
+}
+
 export { dbPath };

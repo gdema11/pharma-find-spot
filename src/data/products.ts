@@ -9,18 +9,18 @@ const categoryPricing: Record<
   string,
   { basePriceInCents: number; stepInCents: number }
 > = {
-  "AnalgÃ©sicos": { basePriceInCents: 1190, stepInCents: 170 },
+  "Analgésicos": { basePriceInCents: 1190, stepInCents: 170 },
   "Medicamentos OTC": { basePriceInCents: 1490, stepInCents: 190 },
   "Vitaminas e Suplementos": { basePriceInCents: 2490, stepInCents: 260 },
   "Higiene Pessoal": { basePriceInCents: 1390, stepInCents: 210 },
   "Cuidados com a Pele": { basePriceInCents: 1890, stepInCents: 260 },
-  "DermocosmÃ©ticos": { basePriceInCents: 4590, stepInCents: 320 },
+  "Dermocosméticos": { basePriceInCents: 4590, stepInCents: 320 },
   "Higiene Bucal": { basePriceInCents: 990, stepInCents: 150 },
-  "BebÃªs e Infantil": { basePriceInCents: 1890, stepInCents: 230 },
+  "Bebês e Infantil": { basePriceInCents: 1890, stepInCents: 230 },
   "Primeiros Socorros": { basePriceInCents: 1290, stepInCents: 210 },
-  "Equipamentos MÃ©dicos": { basePriceInCents: 4990, stepInCents: 650 },
+  "Equipamentos Médicos": { basePriceInCents: 4990, stepInCents: 650 },
   Diabetes: { basePriceInCents: 2590, stepInCents: 420 },
-  "ChÃ¡s e Naturais": { basePriceInCents: 1590, stepInCents: 180 },
+  "Chás e Naturais": { basePriceInCents: 1590, stepInCents: 180 },
   "Suplementos Esportivos": { basePriceInCents: 3590, stepInCents: 390 },
   "Bem-estar": { basePriceInCents: 1790, stepInCents: 250 },
 };
@@ -849,7 +849,7 @@ const extraProducts: SeedProduct[] = [
     id: "bebe-mamadeira-anticolica",
     name: "Mamadeira Anticolica 260 ml",
     brand: "BabySoft",
-    category: "BebÃªs e Infantil",
+    category: "Bebês e Infantil",
     aisleId: "corredor-6",
     description:
       "Bico de fluxo controlado com sistema de ventilacao para reduzir desconfortos na mamada.",
@@ -879,7 +879,7 @@ const extraProducts: SeedProduct[] = [
     id: "naturais-cha-hortela",
     name: "Chá de Hortelã",
     brand: "NaturaTea",
-    category: "ChÃ¡s e Naturais",
+    category: "Chás e Naturais",
     aisleId: "corredor-9",
     description:
       "Infusao refrescante para rotina digestiva e pausas leves durante o dia.",

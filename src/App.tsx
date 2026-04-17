@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-do
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import QualityDashboard from "./pages/QualityDashboard";
+import AdminProdutos from "./pages/AdminProdutos";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,17 @@ const FloatingNavigation = () => {
       >
         Abrir dashboard
       </Link>
+
+      <Link
+        to="/admin/produtos"
+        className={`rounded-full px-5 py-3 text-sm font-medium shadow-lg transition ${
+          location.pathname === "/admin/produtos"
+            ? "bg-primary text-primary-foreground"
+            : "bg-white text-foreground hover:bg-muted"
+        }`}
+      >
+        Admin produtos
+      </Link>
     </nav>
   );
 };
@@ -48,6 +60,7 @@ const AppRoutes = () => (
     <Routes>
       <Route path="/" element={<Index />} />
       <Route path="/dashboard-qualidade" element={<QualityDashboard />} />
+      <Route path="/admin/produtos" element={<AdminProdutos />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   </>

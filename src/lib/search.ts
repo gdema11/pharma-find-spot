@@ -131,11 +131,11 @@ export function getSearchAliases(query: string) {
   }
 
   for (const [key, values] of Object.entries(synonymDictionary)) {
-    if (normalizedQuery.includes(key) || key.includes(normalizedQuery)) {
+    if (normalizedQuery === key || normalizedQuery.startsWith(key) || key.startsWith(normalizedQuery)) {
       aliases.push(key, ...values);
     }
 
-    if (normalizedTokens.some((token) => key.includes(token) || token.includes(key))) {
+    if (normalizedTokens.some((token) => token === key || key.startsWith(token))) {
       aliases.push(key, ...values);
     }
   }
