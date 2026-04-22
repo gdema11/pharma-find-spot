@@ -4,9 +4,9 @@
   "failed": 0,
   "flaky": 0,
   "skipped": 0,
-  "duration": "23.6s",
-  "durationMs": 23579.876,
-  "execution": "06/04/2026, 21:07:22",
+  "duration": "39.2s",
+  "durationMs": 39207.191,
+  "execution": "22/04/2026, 20:34:03",
   "browser": "Chromium",
   "approvalRate": 100,
   "suites": [

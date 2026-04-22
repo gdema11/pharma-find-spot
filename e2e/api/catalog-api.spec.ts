@@ -84,6 +84,6 @@ test.describe('API do catálogo', () => {
 
     const body = await response.json();
 
-    expect(body.error).toBe('Produto nao encontrado');
+    expect(body.error).toBe('Produto não encontrado');
   });
 });
