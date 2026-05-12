@@ -422,9 +422,26 @@ const Index = () => {
             {(topSearchLabels.length > 0 || topNoResultLabels.length > 0) ? (
               <section className="mx-auto grid w-full max-w-4xl gap-4 md:grid-cols-2">
                 <div className="rounded-3xl border border-border/70 bg-card px-5 py-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    Buscas mais feitas
-                  </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      Buscas mais feitas
+                    </p>
+                    {topSearchLabels.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAnalytics((prev) => {
+                            const next = { ...prev, topSearches: [] };
+                            window.localStorage.setItem(SEARCH_ANALYTICS_KEY, JSON.stringify(next));
+                            return next;
+                          });
+                        }}
+                        className="text-xs text-muted-foreground transition hover:text-destructive"
+                      >
+                        Limpar
+                      </button>
+                    )}
+                  </div>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {topSearchLabels.length > 0 ? (
                       topSearchLabels.map((term) => (
@@ -446,9 +463,26 @@ const Index = () => {
                 </div>
 
                 <div className="rounded-3xl border border-border/70 bg-card px-5 py-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    Termos sem resultado
-                  </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      Termos sem resultado
+                    </p>
+                    {topNoResultLabels.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAnalytics((prev) => {
+                            const next = { ...prev, noResultSearches: [] };
+                            window.localStorage.setItem(SEARCH_ANALYTICS_KEY, JSON.stringify(next));
+                            return next;
+                          });
+                        }}
+                        className="text-xs text-muted-foreground transition hover:text-destructive"
+                      >
+                        Limpar
+                      </button>
+                    )}
+                  </div>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {topNoResultLabels.length > 0 ? (
                       topNoResultLabels.map((term) => (
