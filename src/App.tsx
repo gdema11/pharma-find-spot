@@ -12,10 +12,6 @@ const queryClient = new QueryClient();
 
 const FloatingNavigation = () => {
   const location = useLocation();
-  const isAdminArea = location.pathname.startsWith("/admin") || location.pathname === "/dashboard-qualidade";
-
-  if (!isAdminArea) return null;
-
   return (
     <nav
       aria-label="Navegação rápida"
